@@ -244,7 +244,7 @@ export function MagicCircle({ axes, delay = 0 }: MagicCircleProps) {
               fill="#F0EDF5"
               opacity={0.85}
               style={{
-                fontFamily: '"Noto Sans KR", sans-serif',
+                fontFamily: 'var(--font-noto-serif-kr), serif',
                 letterSpacing: '0.18em',
                 fontWeight: 500,
               }}

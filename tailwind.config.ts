@@ -26,12 +26,12 @@ const config: Config = {
       },
       fontFamily: {
         // Engraved Roman caps — for brand and section labels
-        'serif-hero': ['"Cinzel"', '"Trajan Pro"', 'serif'],
+        'serif-hero': ['var(--font-cinzel)', '"Trajan Pro"', 'serif'],
         // Refined italic-friendly display serif — for hero slogan
-        'display':    ['"Cormorant Garamond"', '"EB Garamond"', 'serif'],
+        'display':    ['var(--font-cormorant)', '"EB Garamond"', 'serif'],
         // Korean serif body — replaces the old sans
-        'serif-kr':   ['"Noto Serif KR"', '"Nanum Myeongjo"', 'serif'],
-        'sans-kr':    ['"Noto Serif KR"', '"Nanum Myeongjo"', 'serif'],
+        'serif-kr':   ['var(--font-noto-serif-kr)', '"Nanum Myeongjo"', 'serif'],
+        'sans-kr':    ['var(--font-noto-serif-kr)', '"Nanum Myeongjo"', 'serif'],
       },
       letterSpacing: {
         widest2: '0.2em',

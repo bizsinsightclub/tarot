@@ -70,7 +70,7 @@ function CardBackArt({ seed }: { seed: number }) {
           fill="#E4CCF7"
           opacity={0.75}
           y={1}
-          style={{ fontFamily: 'Cinzel, serif' }}
+          style={{ fontFamily: 'var(--font-cinzel), serif' }}
         >
           ✦
         </text>
