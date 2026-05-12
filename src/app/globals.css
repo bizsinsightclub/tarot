@@ -2,16 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Nanum+Myeongjo:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Noto+Serif+KR:wght@300;400;500;600;700;900&display=swap');
 
 html, body {
-  background-color: #2B2042;
-  color: #FFFFFF;
+  color: #F0EDF5;
   min-height: 100vh;
 }
 
 body {
-  font-family: 'Noto Sans KR', sans-serif;
+  /* Velvet — layered: warm bloom on top, rich purple core, ink edges,
+     wine kiss at base, faint diagonal weave for fabric grain. */
+  background-color: #110720;
+  background-image:
+    radial-gradient(ellipse 90% 60% at 50% 0%,
+      rgba(150, 70, 110, 0.35) 0%,
+      rgba(90, 35, 80, 0.18) 35%,
+      transparent 70%),
+    radial-gradient(ellipse 60% 50% at 50% 110%,
+      rgba(110, 35, 70, 0.30) 0%,
+      transparent 60%),
+    radial-gradient(ellipse 120% 100% at 50% 50%,
+      #2A1340 0%,
+      #1A0B2A 45%,
+      #0E0518 100%),
+    repeating-linear-gradient(45deg,
+      rgba(255, 230, 245, 0.018) 0px,
+      rgba(255, 230, 245, 0.018) 1px,
+      transparent 1px,
+      transparent 3px),
+    repeating-linear-gradient(-45deg,
+      rgba(255, 230, 245, 0.012) 0px,
+      rgba(255, 230, 245, 0.012) 1px,
+      transparent 1px,
+      transparent 4px);
+  background-attachment: fixed;
+  font-family: 'Noto Serif KR', 'Cormorant Garamond', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

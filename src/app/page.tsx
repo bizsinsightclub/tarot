@@ -3,12 +3,14 @@ import { BrandSlogan } from '@/components/BrandSlogan';
 import { SectionLabel } from '@/components/SectionLabel';
 import { SituationPicker } from '@/components/SituationPicker';
 import { Footnote } from '@/components/Footnote';
+import { BackgroundCards } from '@/components/BackgroundCards';
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col">
+    <main className="relative min-h-screen flex flex-col overflow-hidden">
+      <BackgroundCards />
       <Header />
-      <div className="flex-1 flex flex-col items-center justify-center px-6 pb-12">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-12">
         <BrandSlogan />
         <div className="mt-8 w-full">
           <SectionLabel className="mb-6">결정이 필요한 순간</SectionLabel>

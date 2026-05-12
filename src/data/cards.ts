@@ -1,13 +1,20 @@
 /**
- * Full 78-card Rider-Waite-Smith deck with situational scoring.
+ * Full 78-card Rider-Waite-Smith deck with situational scoring + 8-axis vector.
  *
  * Score axes (per situation):
  *   pull    -3..+3   How strongly the card pushes toward action
  *   outcome -3..+3   How good/bad the resulting outcome is
  *
+ * 8-axis vector (situation-agnostic, used by the magic-circle radar):
+ *   luck, opportunity, drive, clarity, relate, stability, change : higher = better
+ *   risk : higher = more shadow / danger (drawn raw, not inverted)
+ *
  * Source of truth — change ONLY here, then update affected vitest scenarios
  * (lesson L03).
  */
+
+import type { AxisVector, AxisTuple } from '@/lib/axes';
+import { axesFromTuple } from '@/lib/axes';
 
 export type SituationKey = 'buy' | 'act' | 'relate';
 
@@ -22,6 +29,7 @@ export interface Card {
   nameKo: string;   // Korean display name
   image: string;    // public path, e.g. /cards/00_fool.jpg
   scores: Record<SituationKey, CardScore>;
+  axes: AxisVector; // 8 dimensions, -3..+3 each
 }
 
 // ---------- Major Arcana (22) ----------
@@ -35,6 +43,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: +3, outcome: +1 },
       relate: { pull: +2, outcome: +1 },
     },
+    axes: {
+      luck: +2, opportunity: +3, drive: +2, clarity: -2,
+      relate:  0, stability:   -2, change: +3, risk: +2,
+    },
   },
   {
     id: 1, name: 'The Magician', nameKo: '마법사',
@@ -43,6 +55,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +2, outcome: +2 },
       act:    { pull: +3, outcome: +3 },
       relate: { pull: +1, outcome: +2 },
+    },
+    axes: {
+      luck: +1, opportunity: +2, drive: +3, clarity: +3,
+      relate:  0, stability:   +1, change: +1, risk: -1,
     },
   },
   {
@@ -53,6 +69,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: -1, outcome: +2 },
       relate: { pull: -1, outcome: +2 },
     },
+    axes: {
+      luck:  0, opportunity: +1, drive: -2, clarity: +1,
+      relate: +1, stability:  +1, change:  0, risk:  0,
+    },
   },
   {
     id: 3, name: 'The Empress', nameKo: '여황제',
@@ -61,6 +81,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +2, outcome: +3 },
       act:    { pull: +2, outcome: +3 },
       relate: { pull: +3, outcome: +3 },
+    },
+    axes: {
+      luck: +2, opportunity: +3, drive: +1, clarity: +1,
+      relate: +3, stability:  +3, change:  0, risk: -2,
     },
   },
   {
@@ -71,6 +95,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: +1, outcome: +2 },
       relate: { pull: -1, outcome: +1 },
     },
+    axes: {
+      luck: +1, opportunity: +1, drive: +2, clarity: +2,
+      relate:  0, stability:  +3, change: -1, risk: -2,
+    },
   },
   {
     id: 5, name: 'The Hierophant', nameKo: '교황',
@@ -79,6 +107,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +1, outcome: +1 },
       act:    { pull:  0, outcome: +1 },
       relate: { pull: +1, outcome: +2 },
+    },
+    axes: {
+      luck: +1, opportunity: +1, drive:  0, clarity: +1,
+      relate: +2, stability:  +2, change: -2, risk: -1,
     },
   },
   {
@@ -89,6 +121,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: +1, outcome: +2 },
       relate: { pull: +3, outcome: +3 },
     },
+    axes: {
+      luck: +2, opportunity: +2, drive: +1, clarity: +2,
+      relate: +3, stability:  +1, change: +1, risk: +1,
+    },
   },
   {
     id: 7, name: 'The Chariot', nameKo: '전차',
@@ -97,6 +133,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +2, outcome: +2 },
       act:    { pull: +3, outcome: +3 },
       relate: { pull: +1, outcome: +1 },
+    },
+    axes: {
+      luck: +2, opportunity: +2, drive: +3, clarity: +2,
+      relate:  0, stability:  +1, change: +2, risk: +1,
     },
   },
   {
@@ -107,6 +147,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: +2, outcome: +3 },
       relate: { pull: +2, outcome: +3 },
     },
+    axes: {
+      luck: +1, opportunity: +1, drive: +2, clarity: +2,
+      relate: +2, stability:  +2, change: +1, risk: -1,
+    },
   },
   {
     id: 9, name: 'The Hermit', nameKo: '은둔자',
@@ -115,6 +159,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: -2, outcome: +1 },
       act:    { pull: -2, outcome:  0 },
       relate: { pull: -3, outcome: -1 },
+    },
+    axes: {
+      luck:  0, opportunity: -2, drive: -3, clarity: +3,
+      relate: -3, stability:  +1, change:  0, risk: -1,
     },
   },
   {
@@ -125,6 +173,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: +1, outcome: +1 },
       relate: { pull:  0, outcome: +1 },
     },
+    axes: {
+      luck: +3, opportunity: +2, drive:  0, clarity: -1,
+      relate:  0, stability:  -2, change: +3, risk: +2,
+    },
   },
   {
     id: 11, name: 'Justice', nameKo: '정의',
@@ -133,6 +185,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull:  0, outcome: +1 },
       act:    { pull: +1, outcome: +2 },
       relate: { pull:  0, outcome: +1 },
+    },
+    axes: {
+      luck:  0, opportunity: +1, drive: +1, clarity: +3,
+      relate: +1, stability:  +2, change:  0, risk: -2,
     },
   },
   {
@@ -143,6 +199,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: -3, outcome: +1 },
       relate: { pull: -1, outcome:  0 },
     },
+    axes: {
+      luck: -1, opportunity:  0, drive: -3, clarity: +2,
+      relate: -1, stability:  -1, change: +1, risk:  0,
+    },
   },
   {
     id: 13, name: 'Death', nameKo: '죽음',
@@ -151,6 +211,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: -2, outcome:  0 },
       act:    { pull: -1, outcome: +2 },
       relate: { pull: -2, outcome: -1 },
+    },
+    axes: {
+      luck:  0, opportunity: +1, drive: -1, clarity: +1,
+      relate: -2, stability:  -2, change: +3, risk: +2,
     },
   },
   {
@@ -161,6 +225,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull:  0, outcome: +2 },
       relate: { pull: +1, outcome: +3 },
     },
+    axes: {
+      luck: +1, opportunity: +1, drive:  0, clarity: +2,
+      relate: +2, stability:  +3, change: +1, risk: -3,
+    },
   },
   {
     id: 15, name: 'The Devil', nameKo: '악마',
@@ -169,6 +237,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +3, outcome: -3 },
       act:    { pull: +3, outcome: -3 },
       relate: { pull: +3, outcome: -3 },
+    },
+    axes: {
+      luck: -1, opportunity: -1, drive: +3, clarity: -3,
+      relate: -2, stability:  -1, change: -1, risk: +3,
     },
   },
   {
@@ -179,6 +251,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: -3, outcome: -3 },
       relate: { pull: -3, outcome: -3 },
     },
+    axes: {
+      luck: -3, opportunity: -1, drive: -2, clarity: +1,
+      relate: -2, stability:  -3, change: +3, risk: +3,
+    },
   },
   {
     id: 17, name: 'The Star', nameKo: '별',
@@ -187,6 +263,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +1, outcome: +3 },
       act:    { pull: +1, outcome: +3 },
       relate: { pull: +2, outcome: +3 },
+    },
+    axes: {
+      luck: +3, opportunity: +2, drive: +1, clarity: +2,
+      relate: +2, stability:  +2, change: +1, risk: -2,
     },
   },
   {
@@ -197,6 +277,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: -1, outcome: -2 },
       relate: { pull: -1, outcome: -2 },
     },
+    axes: {
+      luck: -1, opportunity:  0, drive: -1, clarity: -3,
+      relate: -1, stability:  -2, change:  0, risk: +2,
+    },
   },
   {
     id: 19, name: 'The Sun', nameKo: '태양',
@@ -205,6 +289,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +3, outcome: +3 },
       act:    { pull: +3, outcome: +3 },
       relate: { pull: +3, outcome: +3 },
+    },
+    axes: {
+      luck: +3, opportunity: +3, drive: +2, clarity: +3,
+      relate: +3, stability:  +2, change: +1, risk: -3,
     },
   },
   {
@@ -215,6 +303,10 @@ export const MAJOR_ARCANA: Card[] = [
       act:    { pull: +3, outcome: +3 },
       relate: { pull: +2, outcome: +2 },
     },
+    axes: {
+      luck: +2, opportunity: +3, drive: +2, clarity: +3,
+      relate: +1, stability:  +1, change: +3, risk: -1,
+    },
   },
   {
     id: 21, name: 'The World', nameKo: '세계',
@@ -223,6 +315,10 @@ export const MAJOR_ARCANA: Card[] = [
       buy:    { pull: +2, outcome: +3 },
       act:    { pull: +3, outcome: +3 },
       relate: { pull: +3, outcome: +3 },
+    },
+    axes: {
+      luck: +2, opportunity: +2, drive: +1, clarity: +2,
+      relate: +2, stability:  +3, change: +2, risk: -2,
     },
   },
 ];
@@ -278,7 +374,8 @@ function minor(
   id: number,
   suit: Suit,
   rank: number,
-  scores: ScoreTuple
+  scores: ScoreTuple,
+  axes: AxisTuple
 ): Card {
   const nn = rank.toString().padStart(2, '0');
   return {
@@ -291,6 +388,7 @@ function minor(
       act:    { pull: scores[2], outcome: scores[3] },
       relate: { pull: scores[4], outcome: scores[5] },
     },
+    axes: axesFromTuple(axes),
   };
 }
 
@@ -308,71 +406,73 @@ function minor(
 //   9=fulfillment or solitude          10=completion (heavy or rich)
 //   Page=11 youthful (+pull mild)      Knight=12 rash (+pull, mixed)
 //   Queen=13 mature (+outcome)         King=14 authority (+pull, +outcome)
+//
+// AxisTuple order: [luck, opportunity, drive, clarity, relate, stability, change, risk]
 
 export const MINOR_ARCANA: Card[] = [
   // Wands — id 22..35  [buy.pull, buy.out, act.pull, act.out, rel.pull, rel.out]
-  minor(22, 'wands',  1, [+1, +2, +3, +3, +2, +2]),  // Ace: spark, opportunity
-  minor(23, 'wands',  2, [+1, +1, +1, +2, +1, +1]),  // 2: planning, partnership
-  minor(24, 'wands',  3, [+2, +2, +2, +2, +1, +2]),  // 3: expansion, foresight
-  minor(25, 'wands',  4, [+2, +3, +1, +2, +2, +3]),  // 4: celebration, milestone
-  minor(26, 'wands',  5, [ 0,  0, +1, -1,  0, -1]),  // 5: petty conflict
-  minor(27, 'wands',  6, [+2, +2, +2, +3, +1, +2]),  // 6: victory, recognition
-  minor(28, 'wands',  7, [ 0, +1, +1,  0,  0,  0]),  // 7: defending, perseverance
-  minor(29, 'wands',  8, [+1, +1, +3, +2,  0, +1]),  // 8: swift movement, news
-  minor(30, 'wands',  9, [-1,  0,  0,  0,  0,  0]),  // 9: weary defense
-  minor(31, 'wands', 10, [-2, -2, -1, -1, -1, -1]),  // 10: burden, overload
-  minor(32, 'wands', 11, [+1,  0, +2, +1, +1,  0]),  // Page: enthusiasm, news
-  minor(33, 'wands', 12, [+2,  0, +3,  0, +1,  0]),  // Knight: rash action
-  minor(34, 'wands', 13, [+1, +2, +2, +2, +2, +2]),  // Queen: confident charisma
-  minor(35, 'wands', 14, [+1, +2, +2, +3, +1, +2]),  // King: vision, leadership
+  minor(22, 'wands',  1, [+1, +2, +3, +3, +2, +2], [+1, +3, +3, +1, +1,  0, +2, +1]),  // Ace: spark
+  minor(23, 'wands',  2, [+1, +1, +1, +2, +1, +1], [+1, +2, +1, +2, +1, +1, +1,  0]),  // 2: planning
+  minor(24, 'wands',  3, [+2, +2, +2, +2, +1, +2], [+2, +2, +2, +1, +1, +1, +1,  0]),  // 3: expansion
+  minor(25, 'wands',  4, [+2, +3, +1, +2, +2, +3], [+2, +1, +1, +1, +2, +2,  0, -1]),  // 4: celebration
+  minor(26, 'wands',  5, [ 0,  0, +1, -1,  0, -1], [-1,  0, +2, -1, -2, -1,  0, +2]),  // 5: petty conflict
+  minor(27, 'wands',  6, [+2, +2, +2, +3, +1, +2], [+2, +2, +2, +1, +1, +1, +1, -1]),  // 6: victory
+  minor(28, 'wands',  7, [ 0, +1, +1,  0,  0,  0], [ 0,  0, +2, +1, -1,  0,  0, +1]),  // 7: defending
+  minor(29, 'wands',  8, [+1, +1, +3, +2,  0, +1], [+1, +2, +3, +2, +1, -1, +3, +1]),  // 8: swift movement
+  minor(30, 'wands',  9, [-1,  0,  0,  0,  0,  0], [-1,  0, +1,  0, -1,  0,  0, +2]),  // 9: weary defense
+  minor(31, 'wands', 10, [-2, -2, -1, -1, -1, -1], [-1, -1, -1, -1, -1, -2,  0, +2]),  // 10: burden
+  minor(32, 'wands', 11, [+1,  0, +2, +1, +1,  0], [+1, +2, +2,  0, +1,  0, +1, +1]),  // Page: enthusiasm
+  minor(33, 'wands', 12, [+2,  0, +3,  0, +1,  0], [ 0, +1, +3, -1,  0, -1, +2, +3]),  // Knight: rash
+  minor(34, 'wands', 13, [+1, +2, +2, +2, +2, +2], [+2, +2, +2, +2, +2, +1, +1,  0]),  // Queen: charisma
+  minor(35, 'wands', 14, [+1, +2, +2, +3, +1, +2], [+2, +2, +3, +2, +1, +1, +1, -1]),  // King: vision
 
   // Cups — id 36..49
-  minor(36, 'cups',   1, [ 0, +2, +1, +2, +3, +3]),  // Ace: love begins, overflow
-  minor(37, 'cups',   2, [+1, +2, +1, +2, +3, +3]),  // 2: union, partnership
-  minor(38, 'cups',   3, [+1, +2, +1, +2, +2, +3]),  // 3: celebration, friendship
-  minor(39, 'cups',   4, [-1,  0, -1, -1, -1, -1]),  // 4: apathy, missed opportunity
-  minor(40, 'cups',   5, [-1, -2, -1, -2, -1, -3]),  // 5: regret, loss, melancholy
-  minor(41, 'cups',   6, [+1, +2,  0, +1, +1, +2]),  // 6: nostalgia, kindness
-  minor(42, 'cups',   7, [-1, -1, -1, -1, -1, -1]),  // 7: illusion, indecision
-  minor(43, 'cups',   8, [-2, +1, -2, +2, -2, +1]),  // 8: walking away, deeper search
-  minor(44, 'cups',   9, [+2, +3, +1, +3, +1, +2]),  // 9: wish fulfillment
-  minor(45, 'cups',  10, [+1, +3, +1, +3, +3, +3]),  // 10: bliss, harmony
-  minor(46, 'cups',  11, [ 0, +1, +1, +1, +1, +2]),  // Page: dreamy message
-  minor(47, 'cups',  12, [+1, +1, +1, +1, +2, +2]),  // Knight: romantic offer
-  minor(48, 'cups',  13, [ 0, +2, +1, +2, +2, +3]),  // Queen: nurturing, intuitive
-  minor(49, 'cups',  14, [+1, +2, +1, +2, +2, +3]),  // King: emotional mastery
+  minor(36, 'cups',   1, [ 0, +2, +1, +2, +3, +3], [+2, +2,  0, +1, +3, +1, +2, -2]),  // Ace: love begins
+  minor(37, 'cups',   2, [+1, +2, +1, +2, +3, +3], [+2, +1,  0, +1, +3, +1, +1, -1]),  // 2: union
+  minor(38, 'cups',   3, [+1, +2, +1, +2, +2, +3], [+2, +1, +1,  0, +3, +1,  0, -1]),  // 3: celebration
+  minor(39, 'cups',   4, [-1,  0, -1, -1, -1, -1], [-1, -2, -2, -1, -1,  0, -1, +1]),  // 4: apathy
+  minor(40, 'cups',   5, [-1, -2, -1, -2, -1, -3], [-2,  0, -1, -1, -2, -1, +1, +1]),  // 5: regret
+  minor(41, 'cups',   6, [+1, +2,  0, +1, +1, +2], [+1, +1,  0, +1, +2, +1, -1, -1]),  // 6: nostalgia
+  minor(42, 'cups',   7, [-1, -1, -1, -1, -1, -1], [-1, +1, -1, -3,  0, -1,  0, +2]),  // 7: illusion
+  minor(43, 'cups',   8, [-2, +1, -2, +2, -2, +1], [ 0,  0, +1, +2, -2, -2, +3,  0]),  // 8: walking away
+  minor(44, 'cups',   9, [+2, +3, +1, +3, +1, +2], [+3, +2, +1, +1, +2, +2,  0, -2]),  // 9: wish fulfilled
+  minor(45, 'cups',  10, [+1, +3, +1, +3, +3, +3], [+3, +2, +1, +1, +3, +3,  0, -2]),  // 10: bliss
+  minor(46, 'cups',  11, [ 0, +1, +1, +1, +1, +2], [+1, +1,  0,  0, +2,  0, +1,  0]),  // Page: dreamy
+  minor(47, 'cups',  12, [+1, +1, +1, +1, +2, +2], [+1, +1, +1,  0, +2,  0, +1,  0]),  // Knight: romantic
+  minor(48, 'cups',  13, [ 0, +2, +1, +2, +2, +3], [+1, +1,  0, +2, +3, +2,  0, -2]),  // Queen: empathy
+  minor(49, 'cups',  14, [+1, +2, +1, +2, +2, +3], [+1, +1, +1, +2, +3, +2,  0, -2]),  // King: mastery
 
   // Swords — id 50..63
-  minor(50, 'swords',  1, [+1, +1, +2, +2, +1,  0]),  // Ace: clarity, breakthrough
-  minor(51, 'swords',  2, [-1,  0, -1,  0, -1,  0]),  // 2: stalemate, denial
-  minor(52, 'swords',  3, [-1, -2, -1, -1, -2, -3]),  // 3: heartbreak
-  minor(53, 'swords',  4, [-2, +1, -2, +1, -1,  0]),  // 4: rest, recovery
-  minor(54, 'swords',  5, [ 0, -2,  0, -2, -1, -2]),  // 5: defeat, hollow win
-  minor(55, 'swords',  6, [ 0, +2, +1, +2,  0, +2]),  // 6: transition to better
-  minor(56, 'swords',  7, [+1, -2, +1, -2,  0, -2]),  // 7: deception, sneaky gain
-  minor(57, 'swords',  8, [-2, -1, -2, -1, -2, -1]),  // 8: feeling trapped
-  minor(58, 'swords',  9, [-1, -2, -1, -2, -1, -2]),  // 9: anxiety, despair
-  minor(59, 'swords', 10, [-3, -3, -2, -2, -2, -3]),  // 10: rock bottom
-  minor(60, 'swords', 11, [+1,  0, +1, +1,  0,  0]),  // Page: alert, curious
-  minor(61, 'swords', 12, [+2, -1, +3,  0, +1, -1]),  // Knight: charge ahead, blunt
-  minor(62, 'swords', 13, [ 0, +1, +1, +2,  0, +1]),  // Queen: clear judgment
-  minor(63, 'swords', 14, [ 0, +1, +1, +2,  0, +1]),  // King: stern authority
+  minor(50, 'swords',  1, [+1, +1, +2, +2, +1,  0], [+1, +2, +2, +3,  0,  0, +2, +1]),  // Ace: breakthrough
+  minor(51, 'swords',  2, [-1,  0, -1,  0, -1,  0], [-1, -1, -2, -2, -1, -1, -2, +1]),  // 2: stalemate
+  minor(52, 'swords',  3, [-1, -2, -1, -1, -2, -3], [-2, -1, -1, +1, -3, -1, +1, +2]),  // 3: heartbreak
+  minor(53, 'swords',  4, [-2, +1, -2, +1, -1,  0], [ 0,  0, -2, +2, -1, +1,  0, -1]),  // 4: rest
+  minor(54, 'swords',  5, [ 0, -2,  0, -2, -1, -2], [-2, -1, +1, -1, -2, -2,  0, +2]),  // 5: defeat
+  minor(55, 'swords',  6, [ 0, +2, +1, +2,  0, +2], [+1, +1, +1, +1,  0, +1, +3, -1]),  // 6: transition
+  minor(56, 'swords',  7, [+1, -2, +1, -2,  0, -2], [ 0, +1, +1, -2, -2, -1,  0, +3]),  // 7: deception
+  minor(57, 'swords',  8, [-2, -1, -2, -1, -2, -1], [-2, -2, -2, -2, -1, -2, -1, +2]),  // 8: trapped
+  minor(58, 'swords',  9, [-1, -2, -1, -2, -1, -2], [-2, -1, -2, -2, -1, -2,  0, +3]),  // 9: anxiety
+  minor(59, 'swords', 10, [-3, -3, -2, -2, -2, -3], [-3, -2, -3,  0, -2, -3, +2, +3]),  // 10: rock bottom
+  minor(60, 'swords', 11, [+1,  0, +1, +1,  0,  0], [ 0, +1, +1, +2, -1,  0, +1, +1]),  // Page: alert
+  minor(61, 'swords', 12, [+2, -1, +3,  0, +1, -1], [+1, +1, +3, +1, -1, -1, +2, +3]),  // Knight: charge
+  minor(62, 'swords', 13, [ 0, +1, +1, +2,  0, +1], [ 0, +1, +1, +3, -1, +1,  0,  0]),  // Queen: clear judgment
+  minor(63, 'swords', 14, [ 0, +1, +1, +2,  0, +1], [ 0, +1, +2, +3, -1, +1,  0, -1]),  // King: stern authority
 
   // Pentacles — id 64..77
-  minor(64, 'pentacles',  1, [+2, +3, +2, +3, +1, +2]),  // Ace: prosperity opportunity
-  minor(65, 'pentacles',  2, [ 0, +1, +1, +1,  0, +1]),  // 2: juggling, balance
-  minor(66, 'pentacles',  3, [+1, +2, +2, +2, +1, +2]),  // 3: collaboration, craft
-  minor(67, 'pentacles',  4, [+2, +1,  0,  0, -1,  0]),  // 4: hoarding, control
-  minor(68, 'pentacles',  5, [-2, -2, -1, -2, -2, -2]),  // 5: hardship, lack
-  minor(69, 'pentacles',  6, [+1, +2, +1, +2, +1, +2]),  // 6: generosity, fairness
-  minor(70, 'pentacles',  7, [ 0, +2, -1, +2,  0, +1]),  // 7: long view, patient growth
-  minor(71, 'pentacles',  8, [+1, +2, +2, +3,  0, +1]),  // 8: skilled work, mastery
-  minor(72, 'pentacles',  9, [+2, +3, +1, +2, +1, +2]),  // 9: independence, abundance
-  minor(73, 'pentacles', 10, [+3, +3, +2, +3, +2, +3]),  // 10: legacy, family wealth
-  minor(74, 'pentacles', 11, [+1, +1, +1, +2,  0, +1]),  // Page: study, new venture
-  minor(75, 'pentacles', 12, [ 0, +2,  0, +2,  0, +1]),  // Knight: methodical, slow
-  minor(76, 'pentacles', 13, [+2, +3, +1, +2, +2, +3]),  // Queen: nurturing prosperity
-  minor(77, 'pentacles', 14, [+2, +3, +2, +3, +1, +2]),  // King: established success
+  minor(64, 'pentacles',  1, [+2, +3, +2, +3, +1, +2], [+2, +3, +1, +1, +1, +3, +2, -2]),  // Ace: prosperity
+  minor(65, 'pentacles',  2, [ 0, +1, +1, +1,  0, +1], [+1, +1, +1, +1, +1,  0, +1,  0]),  // 2: juggling
+  minor(66, 'pentacles',  3, [+1, +2, +2, +2, +1, +2], [+1, +2, +1, +2, +2, +2, +1, -1]),  // 3: collaboration
+  minor(67, 'pentacles',  4, [+2, +1,  0,  0, -1,  0], [ 0, -1, -1, +1, -2, +2, -2, +1]),  // 4: hoarding
+  minor(68, 'pentacles',  5, [-2, -2, -1, -2, -2, -2], [-2, -2, -1, -1, -2, -3,  0, +2]),  // 5: hardship
+  minor(69, 'pentacles',  6, [+1, +2, +1, +2, +1, +2], [+2, +1, +1, +2, +2, +2,  0, -2]),  // 6: generosity
+  minor(70, 'pentacles',  7, [ 0, +2, -1, +2,  0, +1], [+1, +2, -1, +2,  0, +2, +1,  0]),  // 7: long view
+  minor(71, 'pentacles',  8, [+1, +2, +2, +3,  0, +1], [+1, +1, +2, +2,  0, +2, +1, -1]),  // 8: skilled work
+  minor(72, 'pentacles',  9, [+2, +3, +1, +2, +1, +2], [+2, +2, +1, +1,  0, +3,  0, -2]),  // 9: abundance
+  minor(73, 'pentacles', 10, [+3, +3, +2, +3, +2, +3], [+2, +2, +1, +1, +2, +3,  0, -2]),  // 10: legacy
+  minor(74, 'pentacles', 11, [+1, +1, +1, +2,  0, +1], [+1, +2, +1, +2, +1, +1, +1,  0]),  // Page: study
+  minor(75, 'pentacles', 12, [ 0, +2,  0, +2,  0, +1], [ 0, +1, +1, +1, +1, +2,  0, -1]),  // Knight: methodical
+  minor(76, 'pentacles', 13, [+2, +3, +1, +2, +2, +3], [+2, +2, +1, +2, +2, +3,  0, -2]),  // Queen: grounded
+  minor(77, 'pentacles', 14, [+2, +3, +2, +3, +1, +2], [+2, +2, +2, +2, +1, +3,  0, -2]),  // King: success
 ];
 
 // ---------- Combined deck ----------

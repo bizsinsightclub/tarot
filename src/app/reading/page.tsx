@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/Header';
 import { SectionLabel } from '@/components/SectionLabel';
 import { CardSpread } from '@/components/CardSpread';
+import { MagicCircle } from '@/components/MagicCircle';
 import { VerdictPanel } from '@/components/VerdictPanel';
 import { Footnote } from '@/components/Footnote';
 import { drawThree, type Spread3 } from '@/lib/draw';
@@ -14,7 +15,10 @@ import { interpret, type Interpretation } from '@/lib/interpret';
 import { situationByKey } from '@/data/situations';
 import type { SituationKey } from '@/data/cards';
 
-const VERDICT_REVEAL_AT_MS = 3100;
+// Triggered slightly before the last card finishes flipping (2.85s) so the
+// magic circle begins to scribe as the deck settles.
+const VERDICT_REVEAL_AT_MS = 2800;
+const VERDICT_TEXT_DELAY_S = 1.7; // After the magic circle has settled.
 
 function ReadingInner() {
   const params = useSearchParams();
@@ -84,7 +88,10 @@ function ReadingInner() {
             >
               <div className="mt-12 mx-auto h-px w-24 bg-pf-rose" />
               <SectionLabel className="mt-8 mb-4">Verdict</SectionLabel>
-              <VerdictPanel meta={reading.meta} />
+              <MagicCircle axes={reading.axes} />
+              <div className="mt-6">
+                <VerdictPanel meta={reading.meta} delay={VERDICT_TEXT_DELAY_S} />
+              </div>
               <div className="mt-8 flex gap-3 justify-center">
                 <button
                   onClick={() => setDrawKey((k) => k + 1)}

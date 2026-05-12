@@ -4,7 +4,7 @@ interface FootnoteProps {
 
 export function Footnote({ children }: FootnoteProps) {
   return (
-    <p className="mt-6 text-center font-sans-kr text-xs text-pf-mute">
+    <p className="mt-8 text-center font-serif-kr text-[13px] text-pf-mute italic">
       *{children}
     </p>
   );

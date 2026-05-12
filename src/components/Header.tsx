@@ -2,13 +2,16 @@ import Link from 'next/link';
 
 export function Header() {
   return (
-    <header className="w-full pt-8 pb-4">
+    <header className="w-full pt-10 pb-4 relative z-10">
       <Link href="/" className="block text-center">
-        <span className="font-sans-kr font-light text-pf-fg text-sm tracking-widest3 uppercase">
+        <span
+          className="font-serif-hero font-medium text-pf-fg-soft text-[15px] uppercase select-none"
+          style={{ letterSpacing: '0.42em' }}
+        >
           Pathfinder
         </span>
       </Link>
-      <div className="mx-auto mt-4 h-px w-24 bg-pf-rose" />
+      <div className="mx-auto mt-4 h-px w-40 bg-gradient-to-r from-transparent via-pf-rose-soft/70 to-transparent" />
     </header>
   );
 }
