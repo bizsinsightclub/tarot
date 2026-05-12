@@ -14,6 +14,9 @@ interface AnimatedCardProps {
 }
 
 const ENTRY_STAGGER = 0.18;
+// next/image with unoptimized + output: 'export' does not auto-prefix
+// basePath onto static asset src paths, so we prepend it ourselves.
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
 export function AnimatedCard({ card, positionLabel, index, flipDelay }: AnimatedCardProps) {
   const [revealed, setRevealed] = useState(false);
@@ -116,7 +119,7 @@ export function AnimatedCard({ card, positionLabel, index, flipDelay }: Animated
             style={{ backfaceVisibility: 'hidden' }}
           >
             <Image
-              src={card.image}
+              src={`${BASE_PATH}${card.image}`}
               alt={card.nameKo}
               fill
               sizes="(max-width: 480px) 30vw, 140px"
