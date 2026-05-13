@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useCallback, useEffect, useRef, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -15,10 +15,10 @@ import { interpret, type Interpretation } from '@/lib/interpret';
 import { situationByKey } from '@/data/situations';
 import type { SituationKey } from '@/data/cards';
 
-// Triggered slightly before the last card finishes flipping (2.85s) so the
-// magic circle begins to scribe as the deck settles.
-const VERDICT_REVEAL_AT_MS = 2800;
-const VERDICT_TEXT_DELAY_S = 1.7; // After the magic circle has settled.
+// MagicCircle settles around 1.95s after mount; verdict text fades in at
+// VERDICT_TEXT_DELAY_S; scroll fires once both have had time to land.
+const VERDICT_TEXT_DELAY_S = 1.7;
+const AUTO_SCROLL_AFTER_MS = (VERDICT_TEXT_DELAY_S + 0.9) * 1000;
 
 function ReadingInner() {
   const params = useSearchParams();
@@ -29,6 +29,7 @@ function ReadingInner() {
   const [reading, setReading] = useState<Interpretation | null>(null);
   const [showVerdict, setShowVerdict] = useState(false);
   const [drawKey, setDrawKey] = useState(0);
+  const verdictAnchorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!situation) return;
@@ -36,21 +37,38 @@ function ReadingInner() {
     const next = drawThree();
     setSpread(next);
     setReading(interpret(next, situation.key as SituationKey));
-    const t = setTimeout(() => setShowVerdict(true), VERDICT_REVEAL_AT_MS);
-    return () => clearTimeout(t);
   }, [situation, drawKey]);
+
+  // Smooth-scroll to the verdict once it appears and has had a moment to settle.
+  useEffect(() => {
+    if (!showVerdict) return;
+    const reduceMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const t = window.setTimeout(() => {
+      verdictAnchorRef.current?.scrollIntoView({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        block: 'center',
+      });
+    }, AUTO_SCROLL_AFTER_MS);
+    return () => window.clearTimeout(t);
+  }, [showVerdict, drawKey]);
+
+  const handleSpreadComplete = useCallback(() => {
+    setShowVerdict(true);
+  }, []);
 
   if (!situation) {
     return (
       <main className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          <p className="font-sans-kr text-pf-fg-soft">
+          <p className="font-serif-kr text-pf-fg-soft">
             상황을 먼저 선택해 주세요.
           </p>
           <Link
             href="/"
-            className="mt-6 font-sans-kr text-sm tracking-widest2 uppercase text-pf-accent hover:text-pf-accent-soft"
+            className="mt-6 font-serif-hero text-sm tracking-widest3 uppercase text-pf-accent hover:text-pf-accent-soft"
           >
             처음으로
           </Link>
@@ -63,7 +81,7 @@ function ReadingInner() {
     <main className="min-h-screen flex flex-col">
       <Header />
       <div className="flex-1 flex flex-col items-center px-6 pb-12">
-        <h1 className="mt-4 font-sans-kr font-bold text-2xl text-pf-fg text-center">
+        <h1 className="mt-4 font-serif-kr font-bold text-2xl text-pf-fg text-center">
           {situation.ko}
         </h1>
         <p className="mt-2 font-serif-kr text-sm text-pf-fg-soft text-center">
@@ -72,7 +90,11 @@ function ReadingInner() {
 
         {spread && (
           <div className="mt-10 w-full">
-            <CardSpread spread={spread} drawKey={drawKey} />
+            <CardSpread
+              spread={spread}
+              drawKey={drawKey}
+              onComplete={handleSpreadComplete}
+            />
           </div>
         )}
 
@@ -89,19 +111,25 @@ function ReadingInner() {
               <div className="mt-12 mx-auto h-px w-24 bg-pf-rose" />
               <SectionLabel className="mt-8 mb-4">Verdict</SectionLabel>
               <MagicCircle axes={reading.axes} />
-              <div className="mt-6">
-                <VerdictPanel meta={reading.meta} delay={VERDICT_TEXT_DELAY_S} />
+              <div ref={verdictAnchorRef} className="mt-6 scroll-mt-16">
+                <VerdictPanel
+                  meta={reading.meta}
+                  strength={reading.strength}
+                  spreadName={reading.spreadName}
+                  spreadCopy={reading.spreadCopy}
+                  delay={VERDICT_TEXT_DELAY_S}
+                />
               </div>
               <div className="mt-8 flex gap-3 justify-center">
                 <button
                   onClick={() => setDrawKey((k) => k + 1)}
-                  className="px-5 py-2.5 rounded-md border border-pf-accent/40 bg-pf-bg/40 hover:bg-pf-accent/10 font-sans-kr text-sm text-pf-fg-soft transition-colors"
+                  className="px-5 py-2.5 rounded-md border border-pf-accent/40 bg-pf-bg/40 hover:bg-pf-accent/10 font-serif-kr text-sm text-pf-fg-soft transition-colors"
                 >
                   다시 뽑기
                 </button>
                 <Link
                   href="/"
-                  className="px-5 py-2.5 rounded-md border border-pf-mute/30 hover:bg-pf-mute/10 font-sans-kr text-sm text-pf-mute transition-colors"
+                  className="px-5 py-2.5 rounded-md border border-pf-mute/30 hover:bg-pf-mute/10 font-serif-kr text-sm text-pf-mute transition-colors"
                 >
                   처음으로
                 </Link>
@@ -122,7 +150,7 @@ export default function ReadingPage() {
     <Suspense
       fallback={
         <main className="min-h-screen flex items-center justify-center">
-          <p className="font-sans-kr text-pf-mute">로딩 중…</p>
+          <p className="font-serif-kr text-pf-mute">로딩 중…</p>
         </main>
       }
     >

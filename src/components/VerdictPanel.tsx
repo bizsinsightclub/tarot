@@ -5,6 +5,9 @@ import type { VerdictMeta } from '@/lib/verdicts';
 
 interface VerdictPanelProps {
   meta: VerdictMeta;
+  strength: number;     // 0..100
+  spreadName: string;   // 조합 명칭
+  spreadCopy: string;   // 5어절 콜드리딩
   delay?: number;
 }
 
@@ -26,7 +29,13 @@ const TONE_GLOW: Record<VerdictMeta['tone'], string> = {
     'shadow-[0_0_40px_rgba(176,170,186,0.25),inset_0_0_30px_rgba(176,170,186,0.06)]',
 };
 
-export function VerdictPanel({ meta, delay = 0 }: VerdictPanelProps) {
+export function VerdictPanel({
+  meta,
+  strength,
+  spreadName,
+  spreadCopy,
+  delay = 0,
+}: VerdictPanelProps) {
   const tone = TONE_CLASSES[meta.tone];
   const glow = TONE_GLOW[meta.tone];
   return (
@@ -36,6 +45,25 @@ export function VerdictPanel({ meta, delay = 0 }: VerdictPanelProps) {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay, type: 'spring', stiffness: 180, damping: 18 }}
     >
+      {/* Spread name + strength */}
+      <motion.div
+        className="flex items-center justify-center gap-3 mb-5"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: delay + 0.05, duration: 0.5 }}
+      >
+        <span className="font-serif-kr text-base text-pf-fg-soft">
+          {spreadName}
+        </span>
+        <span className="text-pf-mute/60 text-xs">·</span>
+        <span
+          className="font-serif-hero text-xs text-pf-mute"
+          style={{ letterSpacing: '0.18em' }}
+        >
+          {strength} <span className="text-pf-mute/50">/ 100</span>
+        </span>
+      </motion.div>
+
       <motion.div
         className="font-serif-hero text-3xl sm:text-4xl font-bold tracking-wider uppercase"
         initial={{ opacity: 0, letterSpacing: '0.3em' }}
@@ -44,12 +72,22 @@ export function VerdictPanel({ meta, delay = 0 }: VerdictPanelProps) {
       >
         {meta.key.replace(/_/g, ' ')}
       </motion.div>
-      <div className="mt-3 font-sans-kr font-bold text-xl text-pf-fg">
+      <div className="mt-3 font-serif-kr font-bold text-xl text-pf-fg">
         {meta.ko}
       </div>
-      <p className="mt-4 font-sans-kr text-sm text-pf-fg-soft leading-relaxed">
+      <p className="mt-4 font-serif-kr text-sm text-pf-fg-soft leading-relaxed">
         {meta.description}
       </p>
+
+      {/* Cold-reading whisper */}
+      <motion.p
+        className="mt-6 font-display italic text-lg text-pf-accent-soft"
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: delay + 0.55, duration: 0.6 }}
+      >
+        &ldquo;{spreadCopy}&rdquo;
+      </motion.p>
     </motion.div>
   );
 }

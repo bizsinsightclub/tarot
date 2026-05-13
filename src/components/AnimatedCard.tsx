@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Card } from '@/data/cards';
 import { CardBack } from './CardBack';
 
@@ -10,28 +10,32 @@ interface AnimatedCardProps {
   card: Card;
   positionLabel: string;
   index: number;
-  flipDelay: number;  // seconds
+  isActive: boolean;    // True only when it's this card's turn to be tapped.
+  isRevealed: boolean;  // True once the user has flipped it.
+  onReveal: () => void;
 }
 
 const ENTRY_STAGGER = 0.18;
-// next/image with unoptimized + output: 'export' does not auto-prefix
-// basePath onto static asset src paths, so we prepend it ourselves.
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
 
-export function AnimatedCard({ card, positionLabel, index, flipDelay }: AnimatedCardProps) {
-  const [revealed, setRevealed] = useState(false);
+export function AnimatedCard({
+  card,
+  positionLabel,
+  index,
+  isActive,
+  isRevealed,
+  onReveal,
+}: AnimatedCardProps) {
   const [burst, setBurst] = useState(false);
 
-  useEffect(() => {
-    const t1 = setTimeout(() => setRevealed(true), flipDelay * 1000);
-    const t2 = setTimeout(() => setBurst(true), flipDelay * 1000 + 50);
-    const t3 = setTimeout(() => setBurst(false), flipDelay * 1000 + 750);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
-  }, [flipDelay]);
+  const tappable = isActive && !isRevealed;
+
+  function handleTap() {
+    if (!tappable) return;
+    onReveal();
+    setBurst(true);
+    window.setTimeout(() => setBurst(false), 750);
+  }
 
   return (
     <motion.div
@@ -46,19 +50,48 @@ export function AnimatedCard({ card, positionLabel, index, flipDelay }: Animated
       }}
     >
       <motion.span
-        className="block mb-3 font-sans-kr font-bold text-xs tracking-widest2 text-pf-accent uppercase"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: revealed ? 1 : 0.5 }}
+        className="block mb-3 font-serif-hero font-medium text-xs tracking-widest2 text-pf-accent uppercase"
+        animate={{ opacity: isRevealed ? 1 : isActive ? 0.85 : 0.4 }}
         transition={{ duration: 0.4 }}
       >
         {positionLabel}
       </motion.span>
 
-      <div
-        className="w-full aspect-[2/3] relative"
+      <motion.div
+        role={tappable ? 'button' : undefined}
+        aria-label={tappable ? `${positionLabel} 카드 열기` : undefined}
+        tabIndex={tappable ? 0 : -1}
+        onClick={handleTap}
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && tappable) {
+            e.preventDefault();
+            handleTap();
+          }
+        }}
+        className={`w-full aspect-[2/3] relative rounded-md ${
+          tappable ? 'cursor-pointer' : ''
+        }`}
         style={{ perspective: '1200px' }}
+        animate={
+          tappable
+            ? {
+                boxShadow: [
+                  '0 0 0px 0px rgba(212,184,240,0)',
+                  '0 0 24px 6px rgba(212,184,240,0.55)',
+                  '0 0 0px 0px rgba(212,184,240,0)',
+                ],
+              }
+            : { boxShadow: '0 0 0px 0px rgba(212,184,240,0)' }
+        }
+        transition={
+          tappable
+            ? { duration: 1.7, repeat: Infinity, ease: 'easeInOut' }
+            : { duration: 0.4 }
+        }
+        whileHover={tappable ? { scale: 1.03 } : undefined}
+        whileTap={tappable ? { scale: 0.97 } : undefined}
       >
-        {/* glow burst behind card */}
+        {/* glow burst behind the card on reveal */}
         <AnimatePresence>
           {burst && (
             <motion.div
@@ -110,7 +143,7 @@ export function AnimatedCard({ card, positionLabel, index, flipDelay }: Animated
         <motion.div
           className="absolute inset-0"
           style={{ transformStyle: 'preserve-3d' }}
-          animate={{ rotateY: revealed ? 0 : 180 }}
+          animate={{ rotateY: isRevealed ? 0 : 180 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         >
           {/* FRONT */}
@@ -138,16 +171,36 @@ export function AnimatedCard({ card, positionLabel, index, flipDelay }: Animated
             <CardBack />
           </div>
         </motion.div>
-      </div>
+      </motion.div>
 
-      <motion.span
-        className="mt-3 font-serif-kr text-sm text-pf-fg-soft text-center"
-        initial={{ opacity: 0, y: 8 }}
-        animate={{ opacity: revealed ? 1 : 0, y: revealed ? 0 : 8 }}
-        transition={{ duration: 0.4, delay: revealed ? 0.2 : 0 }}
-      >
-        {card.nameKo}
-      </motion.span>
+      {/* Below-card label: tap prompt → card name once revealed */}
+      <div className="mt-3 h-6 flex items-center justify-center">
+        <AnimatePresence mode="wait" initial={false}>
+          {isRevealed ? (
+            <motion.span
+              key="name"
+              className="font-serif-kr text-sm text-pf-fg-soft text-center"
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
+              {card.nameKo}
+            </motion.span>
+          ) : tappable ? (
+            <motion.span
+              key="tap"
+              className="font-serif-kr text-[11px] text-pf-accent-soft tracking-widest2"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.45, 0.95, 0.45] }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.4, repeat: Infinity }}
+            >
+              탭하여 열기
+            </motion.span>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 }
