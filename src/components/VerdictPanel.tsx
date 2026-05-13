@@ -6,13 +6,13 @@ import type { VerdictMeta } from '@/lib/verdicts';
 interface VerdictPanelProps {
   meta: VerdictMeta;
   strength: number;     // 0..100
-  spreadName: string;   // 조합 명칭
-  spreadCopy: string;   // 5어절 콜드리딩
+  spreadName: string;   // Korean: "바람의 기다림"
+  spreadNameEn: string; // English: "Wait of the Wind"
   delay?: number;
 }
 
 const TONE_CLASSES: Record<VerdictMeta['tone'], string> = {
-  go: 'text-pf-accent border-pf-accent/50',
+  go:   'text-pf-accent border-pf-accent/50',
   stop: 'text-pf-rose-soft border-pf-rose/60',
   warn: 'text-pf-warn border-pf-warn/50',
   wait: 'text-pf-mute border-pf-mute/40',
@@ -33,7 +33,7 @@ export function VerdictPanel({
   meta,
   strength,
   spreadName,
-  spreadCopy,
+  spreadNameEn,
   delay = 0,
 }: VerdictPanelProps) {
   const tone = TONE_CLASSES[meta.tone];
@@ -45,25 +45,22 @@ export function VerdictPanel({
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ delay, type: 'spring', stiffness: 180, damping: 18 }}
     >
-      {/* Spread name + strength */}
+      {/* Score only — top */}
       <motion.div
-        className="flex items-center justify-center gap-3 mb-5"
+        className="mb-5"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: delay + 0.05, duration: 0.5 }}
       >
-        <span className="font-serif-kr text-base text-pf-fg-soft">
-          {spreadName}
-        </span>
-        <span className="text-pf-mute/60 text-xs">·</span>
         <span
-          className="font-serif-hero text-xs text-pf-mute"
+          className="font-serif-hero text-sm text-pf-mute"
           style={{ letterSpacing: '0.18em' }}
         >
           {strength} <span className="text-pf-mute/50">/ 100</span>
         </span>
       </motion.div>
 
+      {/* Verdict — center */}
       <motion.div
         className="font-serif-hero text-3xl sm:text-4xl font-bold tracking-wider uppercase"
         initial={{ opacity: 0, letterSpacing: '0.3em' }}
@@ -79,15 +76,23 @@ export function VerdictPanel({
         {meta.description}
       </p>
 
-      {/* Cold-reading whisper */}
-      <motion.p
-        className="mt-6 font-display italic text-lg text-pf-accent-soft"
+      {/* Spread name — bottom */}
+      <motion.div
+        className="mt-7 pt-5 border-t border-pf-mute/15"
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.55, duration: 0.6 }}
       >
-        &ldquo;{spreadCopy}&rdquo;
-      </motion.p>
+        <div className="font-serif-kr text-lg text-pf-fg-soft tracking-wide">
+          {spreadName}
+        </div>
+        <div
+          className="mt-1.5 font-display italic text-xs text-pf-mute"
+          style={{ letterSpacing: '0.14em' }}
+        >
+          {spreadNameEn}
+        </div>
+      </motion.div>
     </motion.div>
   );
 }

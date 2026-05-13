@@ -34,9 +34,9 @@ export interface Interpretation {
   pullAvg: number;     // -3..+3
   outcomeAvg: number;  // -3..+3
   axes: AxisVector;    // 8 dims, each -3..+3
-  strength: number;    // 0..100, magnitude of (pullAvg, outcomeAvg)
-  spreadName: string;  // e.g. "광휘의 길"
-  spreadCopy: string;  // e.g. "씨앗이 햇볕을 만난다"
+  strength: number;       // 0..100, magnitude of (pullAvg, outcomeAvg)
+  spreadName: string;     // Korean, e.g. "광휘의 길"
+  spreadNameEn: string;   // English, e.g. "Path of Radiance"
 }
 
 export function computeAxesAvg(
@@ -99,6 +99,6 @@ export function interpret(
     axes,
     strength,
     spreadName: identity.name,
-    spreadCopy: identity.copy,
+    spreadNameEn: identity.nameEn,
   };
 }

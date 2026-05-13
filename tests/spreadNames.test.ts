@@ -11,7 +11,7 @@ describe('spreadIdentity — named lookup', () => {
   it('returns hand-curated entry for known triple', () => {
     const r = spreadIdentity(['beginning', 'resolve', 'apex'], 'go');
     expect(r.name).toBe('광휘의 길');
-    expect(r.copy).toBe('씨앗이 햇볕을 만난다');
+    expect(r.nameEn).toBe('Path of Radiance');
   });
 
   it('has at least 40 hand-curated patterns', () => {
@@ -20,58 +20,55 @@ describe('spreadIdentity — named lookup', () => {
 });
 
 describe('spreadIdentity — fallback', () => {
-  it('produces a non-empty {name, copy} for any tag triple × tone', () => {
+  it('produces a non-empty {name, nameEn} for any tag triple × tone', () => {
     for (const a of NARRATIVE_TAGS) {
       for (const b of NARRATIVE_TAGS) {
         for (const c of NARRATIVE_TAGS) {
           for (const tone of TONES) {
             const r = spreadIdentity([a, b, c], tone);
             expect(r.name.length).toBeGreaterThan(0);
-            expect(r.copy.length).toBeGreaterThan(0);
+            expect(r.nameEn.length).toBeGreaterThan(0);
           }
         }
       }
     }
   });
 
-  it('fallback copy stays within 5 어절', () => {
-    // Pick a triple that is NOT in NAMED_SPREADS.
+  it('fallback name uses future-tag noun', () => {
+    // Pick a triple that should NOT be in NAMED_SPREADS.
     const triple: [NarrativeTag, NarrativeTag, NarrativeTag] = [
       'attraction', 'reflection', 'transition',
     ];
-    for (const tone of TONES) {
-      const r = spreadIdentity(triple, tone);
-      const words = r.copy.split(/\s+/).filter(Boolean);
-      expect(words.length).toBeLessThanOrEqual(5);
-    }
+    const r = spreadIdentity(triple, 'go');
+    expect(r.name).toContain('강');     // future = transition → 강
+    expect(r.nameEn).toContain('River'); // future = transition → River
   });
 
-  it('fallback name uses future-tag noun', () => {
-    const r = spreadIdentity(['attraction', 'reflection', 'transition'], 'go');
-    // future tag = transition → noun "강"
-    expect(r.name).toContain('강');
-  });
-
-  it('go tone fallback uses 닿는다, stop uses 잠긴다', () => {
-    // Pick triples with unique fallback (NAMED lookup miss).
-    const a = spreadIdentity(['conflict', 'apex', 'beginning'], 'go');
-    expect(a.copy).toContain('닿는다');
-
-    const b = spreadIdentity(['apex', 'beginning', 'confusion'], 'stop');
-    expect(b.copy).toContain('잠긴다');
+  it('fallback tone suffix maps to Korean/English correctly', () => {
+    const triple: [NarrativeTag, NarrativeTag, NarrativeTag] = [
+      'attraction', 'reflection', 'transition',
+    ];
+    expect(spreadIdentity(triple, 'go').name).toContain('길');
+    expect(spreadIdentity(triple, 'go').nameEn).toContain('Path');
+    expect(spreadIdentity(triple, 'stop').name).toContain('그늘');
+    expect(spreadIdentity(triple, 'stop').nameEn).toContain('Shadow');
+    expect(spreadIdentity(triple, 'warn').name).toContain('함정');
+    expect(spreadIdentity(triple, 'warn').nameEn).toContain('Trap');
+    expect(spreadIdentity(triple, 'wait').name).toContain('기다림');
+    expect(spreadIdentity(triple, 'wait').nameEn).toContain('Wait');
   });
 });
 
-describe('interpret() — surface SpreadIdentity + strength', () => {
+describe('interpret() — surfaces SpreadIdentity + strength', () => {
   const Sun = cardById(19);
   const Tower = cardById(16);
 
-  it('Sun×3 buy → STRONG_GO with strength 100', () => {
+  it('Sun×3 buy → STRONG_GO with strength 100, name + nameEn set', () => {
     const r = interpret([Sun, Sun, Sun], 'buy');
     expect(r.verdict).toBe('STRONG_GO');
     expect(r.strength).toBe(100);
     expect(r.spreadName.length).toBeGreaterThan(0);
-    expect(r.spreadCopy.length).toBeGreaterThan(0);
+    expect(r.spreadNameEn.length).toBeGreaterThan(0);
   });
 
   it('Tower×3 buy → STRONG_STOP with strength 100', () => {

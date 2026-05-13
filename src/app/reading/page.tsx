@@ -116,7 +116,7 @@ function ReadingInner() {
                   meta={reading.meta}
                   strength={reading.strength}
                   spreadName={reading.spreadName}
-                  spreadCopy={reading.spreadCopy}
+                  spreadNameEn={reading.spreadNameEn}
                   delay={VERDICT_TEXT_DELAY_S}
                 />
               </div>
