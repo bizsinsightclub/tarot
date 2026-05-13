@@ -173,33 +173,31 @@ export function AnimatedCard({
         </motion.div>
       </motion.div>
 
-      {/* Below-card label: tap prompt → card name once revealed */}
-      <div className="mt-3 h-6 flex items-center justify-center">
-        <AnimatePresence mode="wait" initial={false}>
-          {isRevealed ? (
-            <motion.span
-              key="name"
-              className="font-serif-kr text-sm text-pf-fg-soft text-center"
-              initial={{ opacity: 0, y: 4 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, delay: 0.2 }}
-            >
-              {card.nameKo}
-            </motion.span>
-          ) : tappable ? (
-            <motion.span
-              key="tap"
-              className="font-serif-kr text-[11px] text-pf-accent-soft tracking-widest2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: [0.45, 0.95, 0.45] }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.4, repeat: Infinity }}
-            >
-              탭하여 열기
-            </motion.span>
-          ) : null}
-        </AnimatePresence>
+      {/* Below-card label: tap prompt → card name once revealed.
+          Conditional unmount (no AnimatePresence) so the pulsing hint stops
+          immediately when the card is revealed instead of lingering through
+          an exit transition that fights with `repeat: Infinity`. */}
+      <div className="mt-3 h-6 relative flex items-center justify-center">
+        {isRevealed && (
+          <motion.span
+            className="font-serif-kr text-sm text-pf-fg-soft text-center absolute"
+            initial={{ opacity: 0, y: 4 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.2 }}
+          >
+            {card.nameKo}
+          </motion.span>
+        )}
+        {!isRevealed && tappable && (
+          <motion.span
+            className="font-serif-kr text-[11px] text-pf-accent-soft tracking-widest2 absolute"
+            initial={{ opacity: 0.45 }}
+            animate={{ opacity: [0.45, 0.95, 0.45] }}
+            transition={{ duration: 1.4, repeat: Infinity }}
+          >
+            탭하여 열기
+          </motion.span>
+        )}
       </div>
     </motion.div>
   );
