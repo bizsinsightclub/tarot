@@ -176,11 +176,14 @@ export function AnimatedCard({
       {/* Below-card label: tap prompt → card name once revealed.
           Conditional unmount (no AnimatePresence) so the pulsing hint stops
           immediately when the card is revealed instead of lingering through
-          an exit transition that fights with `repeat: Infinity`. */}
-      <div className="mt-3 h-6 relative flex items-center justify-center">
+          an exit transition that fights with `repeat: Infinity`.
+          `whitespace-nowrap` keeps long names like "운명의 수레바퀴" on a
+          single line on iPhone 13 (~106px grid cell) and prevents the text
+          from wrapping into the card area above. */}
+      <div className="mt-3 h-6 flex items-center justify-center w-full overflow-hidden">
         {isRevealed && (
           <motion.span
-            className="font-serif-kr text-sm text-pf-fg-soft text-center absolute"
+            className="font-serif-kr text-[12px] sm:text-sm text-pf-fg-soft text-center whitespace-nowrap leading-none"
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
@@ -190,7 +193,7 @@ export function AnimatedCard({
         )}
         {!isRevealed && tappable && (
           <motion.span
-            className="font-serif-kr text-[11px] text-pf-accent-soft tracking-widest2 absolute"
+            className="font-serif-kr text-[11px] text-pf-accent-soft tracking-widest2 whitespace-nowrap leading-none"
             initial={{ opacity: 0.45 }}
             animate={{ opacity: [0.45, 0.95, 0.45] }}
             transition={{ duration: 1.4, repeat: Infinity }}
