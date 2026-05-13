@@ -25,8 +25,8 @@ const notoSerifKr = Noto_Serif_KR({
 });
 
 export const metadata: Metadata = {
-  title: 'Pathfinder — 운명을 묻고, 선택을 내린다',
-  description: '상황 기반 타로 결정 도구. 살까 말까, 할까 말까, 만날까 말까.',
+  title: '타로에게 물어봐',
+  description: '살까 말까, 할까 말까, 만날까 말까 — 카드 세 장이 답한다.',
 };
 
 export default function RootLayout({

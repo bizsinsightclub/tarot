@@ -33,3 +33,5 @@ next-env.d.ts
 # OMC state
 .omc/state/
 .omc/logs/
+.omc/project-memory.json
+.omc/notepad.md
