@@ -4,6 +4,7 @@ import { SectionLabel } from '@/components/SectionLabel';
 import { SituationPicker } from '@/components/SituationPicker';
 import { Footnote } from '@/components/Footnote';
 import { BackgroundCards } from '@/components/BackgroundCards';
+import { HeroOrnament } from '@/components/HeroOrnament';
 
 export default function Home() {
   return (
@@ -11,7 +12,12 @@ export default function Home() {
       <BackgroundCards />
       <Header />
       <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-6 pb-12">
-        <BrandSlogan />
+        <div className="relative w-full flex justify-center">
+          <HeroOrnament />
+          <div className="relative z-10">
+            <BrandSlogan />
+          </div>
+        </div>
         <div className="mt-8 w-full">
           <SectionLabel className="mb-6">결정이 필요한 순간</SectionLabel>
           <SituationPicker />
